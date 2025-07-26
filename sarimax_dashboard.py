@@ -19,17 +19,26 @@ horizon = st.sidebar.selectbox("Select Forecast Horizon", [24, 72, 168], format_
 # Filter data based on selected horizon
 filtered = forecast_df[forecast_df['horizon'] == horizon]
 
+import matplotlib.dates as mdates
+
 # Plot
 st.subheader(f"Forecast vs Actual — {horizon//24}-Day Ahead")
-fig, ax = plt.subplots(figsize=(10, 5))
+fig, ax = plt.subplots(figsize=(12, 6))
 ax.plot(filtered['timestamp'], filtered['actual'], label='Actual', linewidth=2)
-ax.plot(filtered['timestamp'], filtered['forecast'], label='Forecast', linestyle='--')
+ax.plot(filtered['timestamp'], filtered['forecast'], label='Forecast', linestyle='--', linewidth=2)
 ax.set_title(f"{horizon//24}-Day Ahead Energy Forecast", fontsize=14)
 ax.set_xlabel("Time")
 ax.set_ylabel("Load (MW)")
 ax.legend()
-st.pyplot(fig)
 
+# Format x-axis ticks
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+ax.xaxis.set_major_locator(mdates.HourLocator(interval=2))
+plt.xticks(rotation=45)
+
+# Improve layout and render
+plt.tight_layout()
+st.pyplot(fig)
 # Table
 st.subheader("Forecast Table")
 st.dataframe(filtered[['timestamp', 'actual', 'forecast']].round(2))
